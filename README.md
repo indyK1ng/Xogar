@@ -16,6 +16,8 @@ In order to use Xogar you need the following installed:
 
 Currently Xogar does not support non-Steam installed games.  Nor does it support non-Steam games that were added to Steam.
 
+Currently Xogar assumes all installed games are owned/accessible by the current user.  If you share a computer you may have issues launching games.
+
 How to Run
 ==========
 
