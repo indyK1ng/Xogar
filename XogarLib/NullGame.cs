@@ -15,5 +15,10 @@ namespace XogarLib
         {
             throw new NotImplementedException();
         }
+
+        public override void Store()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
