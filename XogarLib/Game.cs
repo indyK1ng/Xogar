@@ -16,6 +16,14 @@ namespace XogarLib
             return true;
         }
 
+        /// <summary>
+        /// Launches this game
+        /// </summary>
         public abstract void Launch();
+
+        /// <summary>
+        /// Opens the store page associated with this game
+        /// </summary>
+        public abstract void Store();
     }
 }
