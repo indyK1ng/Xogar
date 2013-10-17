@@ -1,0 +1,13 @@
+*.pdb
+*.exe
+*.zip
+*.dll
+*.application
+*.manifest
+*.exe.config
+bin/**/*
+obj/**/*
+*.user
+Debug
+Release
+*.suo
