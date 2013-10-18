@@ -9,10 +9,10 @@ namespace XogarLib
     public class SimpleValveGameParser
     {
         private string configLocation;
+
         public SimpleValveGameParser()
         {
-            // I hate going to the registry for this.  Hopefully I'll be able to understand the configuration file model better later.
-            string steamInstallDir = (string)Registry.GetValue("HKEY_CURRENT_USER\\Software\\Valve\\Steam", "SteamPath", null);
+            string steamInstallDir = Properties.Settings.Default.SteamInstallDirectory;
 
             if (steamInstallDir == null)
             {
