@@ -9,34 +9,53 @@ namespace XogarCL
         [STAThread]
         static void Main(string[] args)
         {
-            Int64 gameId = -1;
-            Game launcher = new NullGame();
-            GamePicker picker = new GamePicker();
-
-            string firstArg = args[0].ToLowerInvariant();
-
-            if (firstArg == "Random".ToLowerInvariant())
+            int exitCode = 0;
+            Arguments arguments = null;
+            try
             {
-                launcher = picker.PickRandomGame();
-            }
-            else
-            {
-                try
+                arguments = new Arguments(args);
+                arguments.Parse();
+                Game launcher = new NullGame();
+
+                if (!arguments.ShowUsage)
                 {
-                    gameId = Int64.Parse(firstArg);
-                    launcher = new SteamGame(gameId);
+                    if (!string.IsNullOrEmpty(arguments.SteamPath))
+                    {
+                        Console.WriteLine("Setting steam install path.");
+                        Configuration.SetSteamPath(arguments.SteamPath);
+                    }
+                    else if (arguments.UseRandom)
+                    {
+                        var picker = new GamePicker();
+                        launcher = picker.PickRandomGame();
+                    }
+                    else
+                    {
+                        launcher = new SteamGame(arguments.GameId);
+                    }
+
+                    if (launcher.IsReal())
+                    {
+                        launcher.Launch();
+                    }
                 }
-                catch 
-                { 
-                    Console.WriteLine("ERROR: The first argument was not a gameID or the random command.");
-                    Environment.Exit(1);
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("ERROR: " + e.Message);
+                exitCode = 1;
+            }
+            finally
+            {
+                if (arguments != null && arguments.ShowUsage)
+                {
+                    Console.WriteLine(arguments.GetUsageStatement());
                 }
             }
 
-
-            if (launcher.IsReal())
+            if (exitCode != 0)
             {
-                launcher.Launch();
+                Environment.Exit(exitCode);
             }
         }
     }
