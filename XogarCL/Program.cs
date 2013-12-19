@@ -26,7 +26,7 @@ namespace XogarCL
                     }
                     else if (arguments.UseRandom)
                     {
-                        var picker = new GamePicker();
+                        var picker = new Games();
                         launcher = picker.PickRandomGame();
                     }
                     else

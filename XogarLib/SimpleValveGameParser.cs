@@ -6,7 +6,7 @@ using Microsoft.Win32;
 
 namespace XogarLib
 {
-    public class SimpleValveGameParser
+    public class SimpleValveGameParser : IGameListingParser
     {
         private string configLocation;
 
@@ -22,7 +22,12 @@ namespace XogarLib
             configLocation = steamInstallDir + "\\config\\config.vdf";
         }
 
-        public IDictionary<String, Game> FindAllSteamGames()
+        public IDictionary<String, Game> GetGameListing()
+        {
+            return FindAllSteamGames();
+        }
+
+        private IDictionary<String, Game> FindAllSteamGames()
         {
             StreamReader configReader = new StreamReader(configLocation);
             string configContents = configReader.ReadToEnd();
