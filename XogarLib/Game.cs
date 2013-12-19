@@ -17,5 +17,7 @@ namespace XogarLib
         }
 
         public abstract void Launch();
+
+        public abstract String Hash();
     }
 }

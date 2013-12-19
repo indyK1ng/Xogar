@@ -22,12 +22,12 @@ namespace XogarLib
             configLocation = steamInstallDir + "\\config\\config.vdf";
         }
 
-        public IEnumerable<Game> FindAllSteamGames()
+        public IDictionary<String, Game> FindAllSteamGames()
         {
             StreamReader configReader = new StreamReader(configLocation);
             string configContents = configReader.ReadToEnd();
 
-            List<Game> steamGames = new List<Game>();
+            Dictionary<String, Game> steamGames = new Dictionary<String, Game>();
             MatchCollection gameListing = GetAllAppListingsFromConfig(configContents);
 
             foreach (Match game in gameListing)
@@ -36,7 +36,7 @@ namespace XogarLib
 
                 if (matchedGame.IsReal())
                 {
-                    steamGames.Add(matchedGame);
+                    steamGames.Add(matchedGame.Hash(), matchedGame);
                 }
             }
             return steamGames;

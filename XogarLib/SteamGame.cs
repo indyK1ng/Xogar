@@ -21,5 +21,10 @@ namespace XogarLib
             Console.WriteLine(startGameUri.AbsoluteUri);
             launch.Navigate(startGameUri);
         }
+
+        public override String Hash()
+        {
+            return String.Format("{0}{1}", SCHEME, gameId.ToString());
+        }
     }
 }
