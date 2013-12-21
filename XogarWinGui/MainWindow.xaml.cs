@@ -9,11 +9,11 @@ namespace XogarWinGui
     /// </summary>
     public partial class MainWindow : Window
     {
-        GamePicker picker;
+        Games picker;
         public MainWindow()
         {
             InitializeComponent();
-            picker = new GamePicker();
+            picker = new Games();
         }
         
         // Electing not to use a command pattern right now because

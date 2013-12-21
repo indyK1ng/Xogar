@@ -6,7 +6,7 @@ using Microsoft.Win32;
 
 namespace XogarLib
 {
-    public class SimpleValveGameParser
+    public class SimpleValveGameParser : IGameListingParser
     {
         private string configLocation;
 
@@ -22,12 +22,17 @@ namespace XogarLib
             configLocation = steamInstallDir + "\\config\\config.vdf";
         }
 
-        public IEnumerable<Game> FindAllSteamGames()
+        public IDictionary<String, Game> GetGameListing()
+        {
+            return FindAllSteamGames();
+        }
+
+        private IDictionary<String, Game> FindAllSteamGames()
         {
             StreamReader configReader = new StreamReader(configLocation);
             string configContents = configReader.ReadToEnd();
 
-            List<Game> steamGames = new List<Game>();
+            Dictionary<String, Game> steamGames = new Dictionary<String, Game>();
             MatchCollection gameListing = GetAllAppListingsFromConfig(configContents);
 
             foreach (Match game in gameListing)
@@ -36,7 +41,7 @@ namespace XogarLib
 
                 if (matchedGame.IsReal())
                 {
-                    steamGames.Add(matchedGame);
+                    steamGames.Add(matchedGame.Hash(), matchedGame);
                 }
             }
             return steamGames;
