@@ -8,11 +8,16 @@ namespace XogarLib
 {
     public class ThirdPartyGameParser:IGameListingParser
     {
+        internal ThirdPartyGames thirdPartyGames;
+
+        public ThirdPartyGameParser()
+        {
+            thirdPartyGames = ThirdPartyGames.Load();
+        }
+
         public IDictionary<String, Game> GetGameListing()
         {
-            ThirdPartyGames thirdGames = ThirdPartyGames.Load();
-
-            return thirdGames.GetGames();
+            return thirdPartyGames.GetGames();
         }
     }
 }

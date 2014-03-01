@@ -11,13 +11,24 @@ namespace XogarLib
         [XmlElement("Games")]
         public List<ThirdPartyGame> games;
 
+        private Int64 nextId;
+
         public ThirdPartyGames()
         {
             games = new List<ThirdPartyGame>();
         }
 
+        [XmlElement("NextId")]
+        public long NextId
+        {
+            set { nextId = value; }
+            get { return nextId; }
+        }
+
         public void Add(ThirdPartyGame game)
         {
+            game.GameId = nextId;
+            nextId++;
             games.Add(game);
         }
 
