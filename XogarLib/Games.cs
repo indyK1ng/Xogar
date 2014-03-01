@@ -29,6 +29,11 @@ namespace XogarLib
             }
         }
 
+        public ThirdPartyGames ThirdParty
+        {
+            get { return thirdParty; }
+        }
+
         public Game PickRandomGame()
         {
             return games.ElementAt((new Random()).Next(games.Count())).Value;
@@ -43,7 +48,7 @@ namespace XogarLib
                 gameList.AppendLine(game.ToString());
             }
 
-            gameList.AppendFormat("Next Third Party Id: {0}\n", thirdParty.NextId);
+            gameList.AppendFormat("Next Third Party Id: {0}\n", ThirdParty.NextId);
 
             return gameList.ToString();
         }

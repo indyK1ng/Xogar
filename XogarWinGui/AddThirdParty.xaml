@@ -1,0 +1,16 @@
+﻿<Window x:Class="XogarWinGui.AddThirdParty"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AddThirdParty" Height="318" Width="546">
+    <Grid Margin="0,0,-8,-20">
+        <Label Margin="11,59,409,186" Content="File Path:"/>
+        <TextBox Height="30" Margin="120,54,89,186" Name="ExecutableLocation"></TextBox>
+        <Button Margin="451,59,49,191" Height="30" Width="35" Click="FileSelectorClick">...</Button>
+        <Label Margin="10,94,410,156" Content="Running Options:"/>
+        <TextBox Height="30" Margin="120,89,89,151" x:Name="RunningOptions"/>
+        <Label Margin="11,24,409,221" Content="Name:"/>
+        <TextBox Height="30" Margin="120,19,89,221" x:Name="GameName"/>
+        <Button Height="30" Width="100" Click="OkClick" Margin="263,163,162,76">OK</Button>
+        <Button Height="30" Width="100" Click="CancelClick" Content="Cancel" Margin="373,168,52,82"/>
+    </Grid>
+</Window>
