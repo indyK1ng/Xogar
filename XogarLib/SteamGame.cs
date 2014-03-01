@@ -26,5 +26,10 @@ namespace XogarLib
         {
             return String.Format("{0}{1}", SCHEME, gameId.ToString());
         }
+
+        public override string ToString()
+        {
+            return Hash();
+        }
     }
 }

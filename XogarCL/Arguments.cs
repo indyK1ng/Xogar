@@ -22,6 +22,9 @@ namespace XogarCL
             Example = "Example SteamPath= \"C:\\program files\\steam\"")]
         public string SteamPath { get; private set; }
 
+        [Argument(Name = "List", Description = "Lists the games that Xogar is aware of.")]
+        public bool ListGames { get; private set; }
+
         public Arguments(IList<string> args)
         {
             _arguments = args;
@@ -53,6 +56,10 @@ namespace XogarCL
                     throw new ArgumentException("Steam install path is required as the second parameter here.");
                 }
                 SteamPath = _arguments[1];
+            }
+            else if("List".Equals(firstArg, StringComparison.OrdinalIgnoreCase))
+            {
+                ListGames = true;
             }
             else
             {
