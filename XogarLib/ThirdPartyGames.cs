@@ -43,11 +43,16 @@ namespace XogarLib
         public static ThirdPartyGames Load()
         {
             XmlSerializer deserialize = new XmlSerializer(typeof(ThirdPartyGames));
-            FileStream stream = new FileStream(Settings.Default.ThirdPartyListing, FileMode.Open, FileAccess.Read);
 
-            ThirdPartyGames thirdGames = (ThirdPartyGames)deserialize.Deserialize(stream);
+            if (File.Exists(Settings.Default.ThirdPartyListing))
+            {
+                FileStream stream = new FileStream(Settings.Default.ThirdPartyListing, FileMode.Open, FileAccess.Read);
+                ThirdPartyGames thirdGames = (ThirdPartyGames) deserialize.Deserialize(stream);
 
-            return thirdGames;
+                return thirdGames;
+            }
+            
+            return new ThirdPartyGames();
         }
     }
 }
