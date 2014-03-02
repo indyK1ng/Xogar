@@ -5,5 +5,8 @@
     <Setting Name="SteamInstallDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)">c:\Program Files (x86)\Steam</Value>
     </Setting>
+    <Setting Name="ThirdPartyListing" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ThirdPartyGames.xml</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

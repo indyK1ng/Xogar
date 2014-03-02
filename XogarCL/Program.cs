@@ -29,6 +29,11 @@ namespace XogarCL
                         var picker = new Games();
                         launcher = picker.PickRandomGame();
                     }
+                    else if (arguments.ListGames)
+                    {
+                        var picker = new Games();
+                        Console.WriteLine(picker.ToString());
+                    }
                     else
                     {
                         launcher = new SteamGame(arguments.GameId);

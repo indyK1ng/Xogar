@@ -1,0 +1,69 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Xml.Serialization;
+using XogarLib.Properties;
+
+namespace XogarLib
+{
+    public class ThirdPartyGames
+    {
+        [XmlElement("Games")]
+        public List<ThirdPartyGame> games;
+
+        private Int64 nextId;
+
+        public ThirdPartyGames()
+        {
+            games = new List<ThirdPartyGame>();
+        }
+
+        [XmlElement("NextId")]
+        public long NextId
+        {
+            set { nextId = value; }
+            get { return nextId; }
+        }
+
+        public void Add(ThirdPartyGame game)
+        {
+            game.GameId = nextId;
+            nextId++;
+            games.Add(game);
+        }
+
+        public IDictionary<String, Game> GetGames()
+        {
+            Dictionary<String, Game> genericGames = new Dictionary<string, Game>();
+
+            foreach (ThirdPartyGame game in games)
+            {
+                genericGames.Add(game.Hash(), game);
+            }
+
+            return genericGames;
+        }
+
+        public void Save()
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(ThirdPartyGames));
+            FileStream stream = new FileStream(Settings.Default.ThirdPartyListing, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            serializer.Serialize(stream, this);
+        }
+
+        public static ThirdPartyGames Load()
+        {
+            XmlSerializer deserialize = new XmlSerializer(typeof(ThirdPartyGames));
+
+            if (File.Exists(Settings.Default.ThirdPartyListing))
+            {
+                FileStream stream = new FileStream(Settings.Default.ThirdPartyListing, FileMode.Open, FileAccess.Read);
+                ThirdPartyGames thirdGames = (ThirdPartyGames) deserialize.Deserialize(stream);
+
+                return thirdGames;
+            }
+            
+            return new ThirdPartyGames();
+        }
+    }
+}

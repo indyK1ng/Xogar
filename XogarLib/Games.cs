@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace XogarLib
 {
@@ -8,6 +9,7 @@ namespace XogarLib
     {
         private IDictionary<String, Game> games;
         private IList<IGameListingParser> gameListingParsers;
+        private ThirdPartyGames thirdParty;
 
         public Games()
         {
@@ -17,15 +19,38 @@ namespace XogarLib
             IGameListingParser parser = new SimpleValveGameParser();
             gameListingParsers.Add(parser);
 
+            ThirdPartyGameParser thirdPartyParser = new ThirdPartyGameParser();
+            thirdParty = thirdPartyParser.thirdPartyGames;
+            gameListingParsers.Add(thirdPartyParser);
+
             foreach (var parse in gameListingParsers)
             {
                 games = games.Union(parse.GetGameListing()).ToDictionary(k => k.Key, v => v.Value);
             }
         }
 
+        public ThirdPartyGames ThirdParty
+        {
+            get { return thirdParty; }
+        }
+
         public Game PickRandomGame()
         {
             return games.ElementAt((new Random()).Next(games.Count())).Value;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder gameList = new StringBuilder();
+
+            foreach (Game game in games.Values)
+            {
+                gameList.AppendLine(game.ToString());
+            }
+
+            gameList.AppendFormat("Next Third Party Id: {0}\n", ThirdParty.NextId);
+
+            return gameList.ToString();
         }
     }
 }

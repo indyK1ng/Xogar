@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 
 namespace XogarLib
 {
@@ -11,9 +12,19 @@ namespace XogarLib
             this.gameId = gameId;
         }
 
+        protected Game()
+        {
+            
+        }
+
         public virtual bool IsReal()
         {
             return true;
+        }
+
+        public virtual bool ShouldSerialize()
+        {
+            return false;
         }
 
         public abstract void Launch();
