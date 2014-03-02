@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using Microsoft.Win32;
+using XogarLib.Properties;
 
 namespace XogarLib
 {
     public class SimpleValveGameParser : IGameListingParser
     {
         private string configLocation;
+        private readonly string APP_FILENAME_TEMPLATE = "appmanifest_{0}.acf";
 
         public SimpleValveGameParser()
         {
@@ -57,6 +60,34 @@ namespace XogarLib
             return gamesListing;
         }
 
+        private String GetGameName(Int64 gameId)
+        {
+            StringBuilder gameFileStringBuilder = new StringBuilder();
+            gameFileStringBuilder.Append(Settings.Default.SteamInstallDirectory);
+            gameFileStringBuilder.Append("\\SteamApps\\");
+            gameFileStringBuilder.AppendFormat(APP_FILENAME_TEMPLATE, gameId);
+
+            try
+            {
+                var manifestReader = new StreamReader(gameFileStringBuilder.ToString());
+
+                string manifestFile = manifestReader.ReadToEnd();
+                string appRegexString = @"\u0022(name)\u0022\s*\u0022.*";
+
+                string name = Regex.Match(manifestFile, appRegexString).ToString();
+
+                name = name.Replace("\"name\"", "");
+                name = name.Replace("\"", "");
+                name = name.Trim();
+
+                return name;
+            }
+            catch
+            {
+                return gameId.ToString();
+            }
+        }
+
         private Game GetGameInformation(Match gameMatch)
         {
             string matchContent = gameMatch.ToString();
@@ -89,8 +120,10 @@ namespace XogarLib
             {
                 return new NullGame();
             }
+            var game = new SteamGame(gameId);
+            game.Name = GetGameName(gameId);
 
-            return new SteamGame(gameId);
+            return game;
         }
     }
 }

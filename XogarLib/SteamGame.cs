@@ -29,7 +29,7 @@ namespace XogarLib
 
         public override string ToString()
         {
-            return Hash();
+            return Name;
         }
     }
 }

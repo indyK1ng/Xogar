@@ -8,5 +8,8 @@
     <Setting Name="ThirdPartyListing" Type="System.String" Scope="User">
       <Value Profile="(Default)">ThirdPartyGames.xml</Value>
     </Setting>
+    <Setting Name="PlaylistFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Playlists.xml</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

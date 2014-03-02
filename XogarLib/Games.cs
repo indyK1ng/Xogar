@@ -7,9 +7,9 @@ namespace XogarLib
 {
     public class Games
     {
-        private IDictionary<String, Game> games;
+        private readonly IDictionary<String, Game> games;
+        private readonly ThirdPartyGames thirdParty;
         private IList<IGameListingParser> gameListingParsers;
-        private ThirdPartyGames thirdParty;
 
         public Games()
         {
@@ -19,31 +19,65 @@ namespace XogarLib
             IGameListingParser parser = new SimpleValveGameParser();
             gameListingParsers.Add(parser);
 
-            ThirdPartyGameParser thirdPartyParser = new ThirdPartyGameParser();
+            var thirdPartyParser = new ThirdPartyGameParser();
             thirdParty = thirdPartyParser.thirdPartyGames;
             gameListingParsers.Add(thirdPartyParser);
 
-            foreach (var parse in gameListingParsers)
+            foreach (IGameListingParser parse in gameListingParsers)
             {
-                games = games.Union(parse.GetGameListing()).ToDictionary(k => k.Key, v => v.Value);
+                games = GamesToPick.Union(parse.GetGameListing()).ToDictionary(k => k.Key, v => v.Value);
             }
+
+            games = games.OrderBy(k => k.Value.Name).ToDictionary(k => k.Key, v => v.Value);
         }
+
+        public Playlist SelectedPlaylist { get; set; }
 
         public ThirdPartyGames ThirdParty
         {
             get { return thirdParty; }
         }
 
+        public IDictionary<String, Game> GamesToPick
+        {
+            get { return games; }
+        }
+
         public Game PickRandomGame()
         {
-            return games.ElementAt((new Random()).Next(games.Count())).Value;
+            return GamesToPick.ElementAt((new Random()).Next(GamesToPick.Count())).Value;
+        }
+
+        public Game PickRandomGameFromPlaylist(int tries)
+        {
+            if (SelectedPlaylist == null)
+            {
+                return PickRandomGame();
+            }
+            List<string> hashes = SelectedPlaylist.GameHashes;
+
+            try
+            {
+                return GamesToPick[hashes.ElementAt((new Random()).Next(hashes.Count))];
+            }
+            catch (KeyNotFoundException)
+            {
+                if (tries < hashes.Count)
+                {
+                    return PickRandomGameFromPlaylist(tries + 1);
+                }
+                else
+                {
+                    throw new Exception("No games in the playlist seem to exist.");
+                }
+            }
         }
 
         public override string ToString()
         {
-            StringBuilder gameList = new StringBuilder();
+            var gameList = new StringBuilder();
 
-            foreach (Game game in games.Values)
+            foreach (Game game in GamesToPick.Values)
             {
                 gameList.AppendLine(game.ToString());
             }

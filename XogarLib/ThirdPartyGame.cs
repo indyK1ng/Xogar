@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using System.Windows;
 using System.Xml.Serialization;
 
 namespace XogarLib
@@ -15,9 +16,6 @@ namespace XogarLib
             get { return gameId; }
             set { gameId = value; }
         }
-
-        [XmlElement("Name")]
-        public string Name { get; set; }
 
         [XmlElement("Executable")]
         public string Executable { get; set; }
@@ -50,7 +48,15 @@ namespace XogarLib
 
         public override void Launch()
         {
-            Process.Start(Executable, Arguments);
+            try
+            {
+                Process.Start(Executable, Arguments);
+            }
+            catch
+            {
+                MessageBox.Show("It appears that this game is not compatible with your system.  Sorry.",
+                    "Error starting game.", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         public override String Hash()
