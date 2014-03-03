@@ -55,6 +55,7 @@ namespace XogarWinGui
             var window = new AddThirdParty();
             window.gameList = picker;
             window.ShowDialog();
+            picker.UpdateGameList();
         }
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
@@ -73,6 +74,8 @@ namespace XogarWinGui
             {
                 gamesLists.Lists.Add(window.newList);
             }
+
+            playlistBox.ItemsSource = playlistDictionary;
         }
 
         private void PlaylistRandom_Click(object sender, RoutedEventArgs e)

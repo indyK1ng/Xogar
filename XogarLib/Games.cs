@@ -7,7 +7,7 @@ namespace XogarLib
 {
     public class Games
     {
-        private readonly IDictionary<String, Game> games;
+        private IDictionary<String, Game> games;
         private readonly ThirdPartyGames thirdParty;
         private IList<IGameListingParser> gameListingParsers;
 
@@ -22,6 +22,13 @@ namespace XogarLib
             var thirdPartyParser = new ThirdPartyGameParser();
             thirdParty = thirdPartyParser.thirdPartyGames;
             gameListingParsers.Add(thirdPartyParser);
+
+            MergeGamesLists();
+        }
+
+        private void MergeGamesLists()
+        {
+            games = new Dictionary<string, Game>();
 
             foreach (IGameListingParser parse in gameListingParsers)
             {
@@ -85,6 +92,11 @@ namespace XogarLib
             gameList.AppendFormat("Next Third Party Id: {0}\n", ThirdParty.NextId);
 
             return gameList.ToString();
+        }
+
+        public void UpdateGameList()
+        {
+            MergeGamesLists();
         }
     }
 }

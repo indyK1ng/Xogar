@@ -12,6 +12,11 @@ namespace XogarLib
         [XmlElement("Playlists")]
         public List<Playlist> Lists { get; set; }
 
+        public Playlists()
+        {
+            Lists = new List<Playlist>();
+        }
+
         public void Save()
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Playlists));
