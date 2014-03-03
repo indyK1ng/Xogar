@@ -17,6 +17,9 @@ namespace XogarLib
             
         }
 
+        [XmlElement("Name")]
+        public string Name { get; set; }
+
         public virtual bool IsReal()
         {
             return true;

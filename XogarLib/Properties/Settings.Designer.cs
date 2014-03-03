@@ -46,5 +46,17 @@ namespace XogarLib.Properties {
                 this["ThirdPartyListing"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Playlists.xml")]
+        public string PlaylistFile {
+            get {
+                return ((string)(this["PlaylistFile"]));
+            }
+            set {
+                this["PlaylistFile"] = value;
+            }
+        }
     }
 }

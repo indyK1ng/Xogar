@@ -9,6 +9,16 @@
                 <MenuItem Header="_Add Third Party Game" Click="NewThirdParty_OnClick"></MenuItem>
             </MenuItem>
         </Menu>
-        <Button Height="50" Width="100" Click="LaunchRandom">Random</Button>
+       <Button Content="Create Playlist" HorizontalAlignment="Left" Height="50" Margin="255,251,0,0" VerticalAlignment="Top" Width="111" Click="Create_PlaylistClick"/>
+        <Button Content="All Random" HorizontalAlignment="Left" Height="50" Margin="371,251,0,0" VerticalAlignment="Top" Width="111" Click="LaunchRandom"/>
+        <ComboBox HorizontalAlignment="Left" Height="24" Margin="10,35,0,0" VerticalAlignment="Top" Width="138" ItemsSource="{Binding playlistDictionary}" Name="playlistBox" SelectionChanged="playlistBox_SelectionChanged">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Key}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Content="Playlist Random" HorizontalAlignment="Left" Height="50" Margin="255,187,0,0" VerticalAlignment="Top" Width="111" Click="PlaylistRandom_Click"/>
+        <ItemsControl Height="200" Width="138" HorizontalAlignment="Left" Margin="10,101,0,19" Name="PlaylistItems"></ItemsControl>
     </Grid>
 </Window>
