@@ -33,5 +33,17 @@ namespace XogarWinGui.Properties {
                 return ((string)(this["SteamNotInDefaultDir"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ActualInstallDir.txt")]
+        public string SteamInstallDirStorage {
+            get {
+                return ((string)(this["SteamInstallDirStorage"]));
+            }
+            set {
+                this["SteamInstallDirStorage"] = value;
+            }
+        }
     }
 }
