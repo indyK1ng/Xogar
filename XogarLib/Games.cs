@@ -16,11 +16,28 @@ namespace XogarLib
             gameListingParsers = new List<IGameListingParser>();
             games = new Dictionary<String, Game>();
 
-            IGameListingParser parser = new SimpleValveGameParser();
+            IGameListingParser parser = new SimpleValveGameParser(Properties.Settings.Default.SteamInstallDirectory);
             gameListingParsers.Add(parser);
 
             var thirdPartyParser = new ThirdPartyGameParser();
             thirdParty = thirdPartyParser.thirdPartyGames;
+
+            gameListingParsers.Add(thirdPartyParser);
+
+            MergeGamesLists();
+        }
+
+        public Games(String steamInstallDir)
+        {
+            gameListingParsers = new List<IGameListingParser>();
+            games = new Dictionary<String, Game>();
+
+            IGameListingParser parser = new SimpleValveGameParser(steamInstallDir);
+            gameListingParsers.Add(parser);
+
+            var thirdPartyParser = new ThirdPartyGameParser();
+            thirdParty = thirdPartyParser.thirdPartyGames;
+
             gameListingParsers.Add(thirdPartyParser);
 
             MergeGamesLists();

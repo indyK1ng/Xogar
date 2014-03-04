@@ -18,7 +18,18 @@ namespace XogarWinGui
         public MainWindow()
         {
             InitializeComponent();
-            picker = new Games();
+            try
+            {
+
+                picker = new Games();
+                ChangeSteamInstallDir();
+            }
+            catch (Exception)
+            {
+                String actualInstallDir = ChangeSteamInstallDir().InstallDirectory;
+                picker = new Games(actualInstallDir);
+            }
+
             gamesLists = Playlists.Load();
             DataContext = this;
 
@@ -113,6 +124,13 @@ namespace XogarWinGui
 
                 PlaylistItems.ItemsSource = new List<Game>();
             }
+        }
+
+        private SteamInstallSelectorWindow ChangeSteamInstallDir()
+        {
+            var window = new SteamInstallSelectorWindow();
+            window.ShowDialog();
+            return window;
         }
     }
 }

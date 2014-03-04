@@ -13,10 +13,8 @@ namespace XogarLib
         private string configLocation;
         private readonly string APP_FILENAME_TEMPLATE = "appmanifest_{0}.acf";
 
-        public SimpleValveGameParser()
+        public SimpleValveGameParser(string steamInstallDir)
         {
-            string steamInstallDir = Properties.Settings.Default.SteamInstallDirectory;
-
             if (steamInstallDir == null)
             {
                 throw new Exception("Steam not found.  This application currently requires Steam in order to function.");
@@ -34,6 +32,7 @@ namespace XogarLib
         {
             StreamReader configReader = new StreamReader(configLocation);
             string configContents = configReader.ReadToEnd();
+            configReader.Close();
 
             Dictionary<String, Game> steamGames = new Dictionary<String, Game>();
             MatchCollection gameListing = GetAllAppListingsFromConfig(configContents);

@@ -32,6 +32,7 @@ namespace XogarLib
             {
                 FileStream stream = new FileStream(Settings.Default.PlaylistFile, FileMode.Open, FileAccess.Read);
                 Playlists gameSelectLists = (Playlists)deserialize.Deserialize(stream);
+                stream.Close();
 
                 return gameSelectLists;
             }

@@ -59,6 +59,7 @@ namespace XogarLib
             {
                 FileStream stream = new FileStream(Settings.Default.ThirdPartyListing, FileMode.Open, FileAccess.Read);
                 ThirdPartyGames thirdGames = (ThirdPartyGames) deserialize.Deserialize(stream);
+                stream.Close();
 
                 return thirdGames;
             }
