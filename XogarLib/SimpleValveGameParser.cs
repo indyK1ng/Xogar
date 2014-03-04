@@ -10,6 +10,7 @@ namespace XogarLib
 {
     public class SimpleValveGameParser : IGameListingParser
     {
+        private string installDir;
         private string configLocation;
         private readonly string APP_FILENAME_TEMPLATE = "appmanifest_{0}.acf";
 
@@ -19,6 +20,8 @@ namespace XogarLib
             {
                 throw new Exception("Steam not found.  This application currently requires Steam in order to function.");
             }
+
+            installDir = steamInstallDir;
 
             configLocation = steamInstallDir + "\\config\\config.vdf";
         }
@@ -62,7 +65,7 @@ namespace XogarLib
         private String GetGameName(Int64 gameId)
         {
             StringBuilder gameFileStringBuilder = new StringBuilder();
-            gameFileStringBuilder.Append(Settings.Default.SteamInstallDirectory);
+            gameFileStringBuilder.Append(installDir);
             gameFileStringBuilder.Append("\\SteamApps\\");
             gameFileStringBuilder.AppendFormat(APP_FILENAME_TEMPLATE, gameId);
 

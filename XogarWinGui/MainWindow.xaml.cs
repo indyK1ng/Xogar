@@ -63,7 +63,8 @@ namespace XogarWinGui
         {
             FileStream saveLocation = new FileStream(Properties.Settings.Default.SteamInstallDirStorage, FileMode.Create);
             StreamWriter locationWriter = new StreamWriter(saveLocation);
-            locationWriter.Write(actualInstallDir);
+            locationWriter.AutoFlush = true;
+            locationWriter.Write(actualInstallDir.ToString());
             saveLocation.Close();
         }
 
