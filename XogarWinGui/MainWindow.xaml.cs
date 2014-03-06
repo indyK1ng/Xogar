@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Documents;
 using XogarLib;
@@ -12,17 +13,59 @@ namespace XogarWinGui
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly Games picker;
+        private Games picker;
         private Playlists gamesLists;
 
         public MainWindow()
         {
             InitializeComponent();
-            picker = new Games();
+            try
+            {
+                picker = new Games();
+            }
+            catch (Exception)
+            {
+                if (File.Exists(Properties.Settings.Default.SteamInstallDirStorage))
+                {
+                    ReadInstallLocationAndLoadGames();
+                }
+                else
+                {
+                    PromptForSteamInstallDir();
+                }
+            }
+
             gamesLists = Playlists.Load();
             DataContext = this;
 
             playlistBox.ItemsSource = playlistDictionary;
+        }
+
+        private void ReadInstallLocationAndLoadGames()
+        {
+            FileStream reader = new FileStream(Properties.Settings.Default.SteamInstallDirStorage, FileMode.Open);
+            StreamReader locationReader = new StreamReader(reader);
+
+            String actualInstallDir = locationReader.ReadToEnd();
+            picker = new Games(actualInstallDir);
+            locationReader.Close();
+        }
+
+        private void PromptForSteamInstallDir()
+        {
+            String actualInstallDir = ChangeSteamInstallDir().InstallDirectory;
+            picker = new Games(actualInstallDir);
+
+            SaveSteamInstallDir(actualInstallDir);
+        }
+
+        private static void SaveSteamInstallDir(string actualInstallDir)
+        {
+            FileStream saveLocation = new FileStream(Properties.Settings.Default.SteamInstallDirStorage, FileMode.Create);
+            StreamWriter locationWriter = new StreamWriter(saveLocation);
+            locationWriter.AutoFlush = true;
+            locationWriter.Write(actualInstallDir.ToString());
+            saveLocation.Close();
         }
 
         public Dictionary<String, Playlist> playlistDictionary
@@ -113,6 +156,13 @@ namespace XogarWinGui
 
                 PlaylistItems.ItemsSource = new List<Game>();
             }
+        }
+
+        private SteamInstallSelectorWindow ChangeSteamInstallDir()
+        {
+            var window = new SteamInstallSelectorWindow();
+            window.ShowDialog();
+            return window;
         }
     }
 }

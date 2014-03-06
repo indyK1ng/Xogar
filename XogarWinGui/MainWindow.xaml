@@ -1,17 +1,17 @@
 ﻿<Window x:Class="XogarWinGui.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Xogar: Game Launcher" Height="350" Width="525"
+        Title="Xogar: Game Launcher" Height="359" Width="525"
         Closing="MainWindow_OnClosing">
     <Grid>
-        <Menu Margin="0,0,0,290" >
+        <Menu Margin="0,0,0,290" Height="25" VerticalAlignment="Top">
             <MenuItem Header="File">
                 <MenuItem Header="_Add Third Party Game" Click="NewThirdParty_OnClick"></MenuItem>
             </MenuItem>
         </Menu>
        <Button Content="Create Playlist" HorizontalAlignment="Left" Height="50" Margin="255,251,0,0" VerticalAlignment="Top" Width="111" Click="Create_PlaylistClick"/>
         <Button Content="All Random" HorizontalAlignment="Left" Height="50" Margin="371,251,0,0" VerticalAlignment="Top" Width="111" Click="LaunchRandom"/>
-        <ComboBox HorizontalAlignment="Left" Height="24" Margin="10,35,0,0" VerticalAlignment="Top" Width="138" ItemsSource="{Binding playlistDictionary}" Name="playlistBox" SelectionChanged="playlistBox_SelectionChanged">
+        <ComboBox HorizontalAlignment="Left" Height="24" Margin="10,35,0,0" VerticalAlignment="Top" Width="200" ItemsSource="{Binding playlistDictionary}" Name="playlistBox" SelectionChanged="playlistBox_SelectionChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Key}"/>
@@ -19,6 +19,9 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
         <Button Content="Playlist Random" HorizontalAlignment="Left" Height="50" Margin="255,187,0,0" VerticalAlignment="Top" Width="111" Click="PlaylistRandom_Click"/>
-        <ItemsControl Height="200" Width="138" HorizontalAlignment="Left" Margin="10,101,0,19" Name="PlaylistItems"></ItemsControl>
+
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Height="200" Width="200" HorizontalAlignment="Left" Margin="10,101,0,19">
+            <ItemsControl Name="PlaylistItems"></ItemsControl>
+        </ScrollViewer>
     </Grid>
 </Window>
