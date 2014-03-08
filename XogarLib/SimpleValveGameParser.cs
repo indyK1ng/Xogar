@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
@@ -13,6 +14,7 @@ namespace XogarLib
         private string installDir;
         private string configLocation;
         private readonly string APP_FILENAME_TEMPLATE = "appmanifest_{0}.acf";
+        private List<String> gameInstallDirs;
 
         public SimpleValveGameParser(string steamInstallDir)
         {
@@ -22,6 +24,8 @@ namespace XogarLib
             }
 
             installDir = steamInstallDir;
+            
+            gameInstallDirs = new List<String>();
 
             configLocation = steamInstallDir + "\\config\\config.vdf";
         }
@@ -31,11 +35,33 @@ namespace XogarLib
             return FindAllSteamGames();
         }
 
+        private void FindAllGameInstallDirs(string configContents)
+        {
+            gameInstallDirs.Add(installDir);
+
+            string gamesInstallLocations = @"\u0022BaseInstallFolder_\d+\u0022\s*\u0022.*\u0022";
+            Regex installDirsRegex = new Regex(gamesInstallLocations);
+            MatchCollection installListing = installDirsRegex.Matches(configContents);
+
+            foreach (Match gameInstallDir in installListing)
+            {
+                string dir = gameInstallDir.ToString();
+                dir = dir.Replace("\"", "");
+                var splits = dir.Split('\t');
+
+                dir = splits[splits.Length - 1];
+
+                gameInstallDirs.Add(dir);
+            }
+        }
+
         private IDictionary<String, Game> FindAllSteamGames()
         {
             StreamReader configReader = new StreamReader(configLocation);
             string configContents = configReader.ReadToEnd();
             configReader.Close();
+
+            FindAllGameInstallDirs(configContents);
 
             Dictionary<String, Game> steamGames = new Dictionary<String, Game>();
             MatchCollection gameListing = GetAllAppListingsFromConfig(configContents);
@@ -54,7 +80,6 @@ namespace XogarLib
 
         private MatchCollection GetAllAppListingsFromConfig(string configContents)
         {
-            // Less than ideal Regex.  Making one that automatically excludes "DecryptionKey" would be ideal
             string appRegexString = @"\u0022(\d)+\u0022\s*{\s*([^}])*}";
             Regex gamesRegex = new Regex(appRegexString);
             MatchCollection gamesListing = gamesRegex.Matches(configContents);
@@ -64,30 +89,57 @@ namespace XogarLib
 
         private String GetGameName(Int64 gameId)
         {
-            StringBuilder gameFileStringBuilder = new StringBuilder();
-            gameFileStringBuilder.Append(installDir);
-            gameFileStringBuilder.Append("\\SteamApps\\");
-            gameFileStringBuilder.AppendFormat(APP_FILENAME_TEMPLATE, gameId);
+            var gameFileStringBuilder = GetFilePath(gameId);
+
+            if (gameFileStringBuilder == "DNE")
+            {
+                return gameId.ToString();
+            }
 
             try
             {
-                var manifestReader = new StreamReader(gameFileStringBuilder.ToString());
+                var manifestReader = new StreamReader(gameFileStringBuilder);
 
-                string manifestFile = manifestReader.ReadToEnd();
-                string appRegexString = @"\u0022(name)\u0022\s*\u0022.*";
-
-                string name = Regex.Match(manifestFile, appRegexString).ToString();
-
-                name = name.Replace("\"name\"", "");
-                name = name.Replace("\"", "");
-                name = name.Trim();
-
-                return name;
+                var gameName = ParseOutGameName(manifestReader);
+                manifestReader.Close();
+                return gameName;
             }
             catch
             {
                 return gameId.ToString();
             }
+        }
+
+        private String GetFilePath(long gameId)
+        {
+            foreach (string gamesInstallDir in gameInstallDirs)
+            {
+                StringBuilder gameFileStringBuilder = new StringBuilder();
+                gameFileStringBuilder.Append(gamesInstallDir);
+                gameFileStringBuilder.Append("\\SteamApps\\");
+                gameFileStringBuilder.AppendFormat(APP_FILENAME_TEMPLATE, gameId);
+
+                if (File.Exists(gameFileStringBuilder.ToString()))
+                {
+                    return gameFileStringBuilder.ToString();
+                }
+            }
+
+            return "DNE";
+        }
+
+        private static string ParseOutGameName(StreamReader manifestReader)
+        {
+            string manifestFile = manifestReader.ReadToEnd();
+            string appRegexString = @"\u0022(name)\u0022\s*\u0022.*";
+
+            string name = Regex.Match(manifestFile, appRegexString).ToString();
+
+            name = name.Replace("\"name\"", "");
+            name = name.Replace("\"", "");
+            name = name.Trim();
+
+            return name;
         }
 
         private Game GetGameInformation(Match gameMatch)
@@ -113,19 +165,49 @@ namespace XogarLib
                 return new NullGame();
             }
 
-            string textRemoved = hasLocalContentLine.Replace("HasAllLocalContent", "");
-            string quotesRemoved = textRemoved.Replace("\"", "");
-            string sterilizedValue = quotesRemoved.Replace("\t\t", "");
-            Int16 isInstalled = Int16.Parse(sterilizedValue);
+            var isInstalled = IsInstalled(hasLocalContentLine);
 
             if (isInstalled == 0)
             {
                 return new NullGame();
             }
+
             var game = new SteamGame(gameId);
             game.Name = GetGameName(gameId);
 
+            if (game.Name == gameId.ToString())
+            {
+                game.Name = GetGameNameFromConfigSection(matchContent);
+            }
+
             return game;
+        }
+
+        private String GetGameNameFromConfigSection(string matchContent)
+        {
+            var contentLines = matchContent.Split(Environment.NewLine.ToCharArray());
+            string filePath = "";
+
+            foreach (string line in contentLines)
+            {
+                if (line.Contains("installdir"))
+                {
+                    filePath = line.Split('\t').Last();
+                    filePath = filePath.Replace("\"", "");
+                }
+            }
+
+            string makeshiftName = Path.GetFullPath(filePath).TrimEnd(Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar).Last();
+            return makeshiftName;
+        }
+
+        private static short IsInstalled(string hasLocalContentLine)
+        {
+            string textRemoved = hasLocalContentLine.Replace("HasAllLocalContent", "");
+            string quotesRemoved = textRemoved.Replace("\"", "");
+            string sterilizedValue = quotesRemoved.Replace("\t\t", "");
+            Int16 isInstalled = Int16.Parse(sterilizedValue);
+            return isInstalled;
         }
     }
 }
