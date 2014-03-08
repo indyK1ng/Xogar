@@ -22,6 +22,12 @@
               <Component Id="XOGARWINGUI.EXE.MANIFEST" DiskId="1" Guid="4B80B6AA-F75D-4562-8494-3CE6E1218C1C">
                 <File Id="XOGARWINGUI.EXE.MANIFEST" Name="XogarWinGui.exe.manifest" Source="..\XogarWinGui\bin\Release\XogarWinGui.exe.manifest" />
               </Component>
+              <Component Id="Readme" DiskId="1" Guid="112F7F1A-6BA9-4C34-BA94-9EFA7DB3F431">
+                <File Id="Readme" Name="Readme.md" Source="..\Readme.md" />
+              </Component>
+              <Component Id="License" DiskId="1" Guid="ECF93E92-3CD9-4155-B15C-27964694E444">
+                <File Id="License" Name="License.txt" Source="..\License" />
+              </Component>
             </Directory>
           </Directory>
           
@@ -49,6 +55,8 @@
             <ComponentRef Id="XOGARWINGUI.EXE.CONFIG" />
             <ComponentRef Id="XOGARWINGUI.EXE.MANIFEST" />
             <ComponentRef Id="XogarShortcut"/>
+            <ComponentRef Id="Readme" />
+            <ComponentRef Id="License" />
         </Feature>
         <UI />
     </Product>
