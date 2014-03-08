@@ -12,6 +12,7 @@ namespace XogarLib
         public List<ThirdPartyGame> games;
 
         private Int64 nextId;
+        private static string envFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Xogar\\" + Settings.Default.ThirdPartyListing;
 
         public ThirdPartyGames()
         {
@@ -47,7 +48,7 @@ namespace XogarLib
         public void Save()
         {
             XmlSerializer serializer = new XmlSerializer(typeof(ThirdPartyGames));
-            FileStream stream = new FileStream(Settings.Default.ThirdPartyListing, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            FileStream stream = new FileStream(envFolderPath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             serializer.Serialize(stream, this);
         }
 
@@ -55,9 +56,9 @@ namespace XogarLib
         {
             XmlSerializer deserialize = new XmlSerializer(typeof(ThirdPartyGames));
 
-            if (File.Exists(Settings.Default.ThirdPartyListing))
+            if (File.Exists(envFolderPath))
             {
-                FileStream stream = new FileStream(Settings.Default.ThirdPartyListing, FileMode.Open, FileAccess.Read);
+                FileStream stream = new FileStream(envFolderPath, FileMode.Open, FileAccess.Read);
                 ThirdPartyGames thirdGames = (ThirdPartyGames) deserialize.Deserialize(stream);
                 stream.Close();
 

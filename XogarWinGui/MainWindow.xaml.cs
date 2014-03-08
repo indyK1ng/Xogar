@@ -103,6 +103,12 @@ namespace XogarWinGui
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
+            string envFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Xogar\\";
+            if (!Directory.Exists(envFolder))
+            {
+                Directory.CreateDirectory(envFolder);
+            }
+
             picker.ThirdParty.Save();
             gamesLists.Save();
         }

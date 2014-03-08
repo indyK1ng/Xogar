@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="0BD634F5-B8E4-41E3-A0C6-B2728CE730DA" Name="Xogar" Language="1033" Version="1.2.3" Manufacturer="Xogar Open Source Devs" UpgradeCode="5EAB86C3-D79A-493B-BC7D-534E40F91E70">
+        <Package Description="The Xogar Windows GUI." Comments="Xogar starts a random game in your collection" InstallerVersion="200" Compressed="yes" />
+        <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+      
+        <Directory Id="TARGETDIR" Name="SourceDir">
+          <Directory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="Xogar">
+              <Component Id="XOGARLIB.DLL" DiskId="1" Guid="6720478B-FBEC-421E-9318-FEE1B1E6001F">
+                <File Id="XOGARLIB.DLL" Name="XogarLib.dll" Source="..\XogarWinGui\bin\Release\XogarLib.dll" />
+              </Component>
+              <Component Id="XOGARWINGUI.APPLICATION" DiskId="1" Guid="A424DC47-7810-4A9A-9316-CF3B1FC03460">
+                <File Id="XOGARWINGUI.APPLICATION" Name="XogarWinGui.application" Source="..\XogarWinGui\bin\Release\XogarWinGui.application" />
+              </Component>
+              <Component Id="XOGARWINGUI.EXE" DiskId="1" Guid="337741A6-AD6B-4D78-9397-A2D6BFCB71C6">
+                <File Id="XOGARWINGUI.EXE" Name="XogarWinGui.exe" Source="..\XogarWinGui\bin\Release\XogarWinGui.exe" />
+              </Component>
+              <Component Id="XOGARWINGUI.EXE.CONFIG" DiskId="1" Guid="FD5715BB-2727-4001-A1C8-0EAF7550E0C0">
+                <File Id="XOGARWINGUI.EXE.CONFIG" Name="XogarWinGui.exe.config" Source="..\XogarWinGui\bin\Release\XogarWinGui.exe.config" />
+              </Component>
+              <Component Id="XOGARWINGUI.EXE.MANIFEST" DiskId="1" Guid="4B80B6AA-F75D-4562-8494-3CE6E1218C1C">
+                <File Id="XOGARWINGUI.EXE.MANIFEST" Name="XogarWinGui.exe.manifest" Source="..\XogarWinGui\bin\Release\XogarWinGui.exe.manifest" />
+              </Component>
+              <Component Id="Readme" DiskId="1" Guid="112F7F1A-6BA9-4C34-BA94-9EFA7DB3F431">
+                <File Id="Readme" Name="Readme.md" Source="..\Readme.md" />
+              </Component>
+              <Component Id="License" DiskId="1" Guid="ECF93E92-3CD9-4155-B15C-27964694E444">
+                <File Id="License" Name="License.txt" Source="..\License" />
+              </Component>
+            </Directory>
+          </Directory>
+          
+          <Directory Id="ProgramMenuFolder">
+            <Directory Id="ApplicationProgramsFolder" Name="Xogar" />
+          </Directory>
+        </Directory>
+
+      <DirectoryRef Id="ApplicationProgramsFolder">
+        <Component Id="XogarShortcut" Guid="E1A7C7C4-3FB2-4182-85B0-3B50B3312FB2">
+          <Shortcut Id="XogarStartMenuShortcut"
+                          Name="Xogar"
+                          Description="Random game starter."
+                          Target="[#XOGARWINGUI.EXE]"
+                          WorkingDirectory="INSTALLFOLDER" />
+          <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+          <RegistryValue Root="HKCU" Key="Software\Microsoft\Xogar" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+        </Component>
+      </DirectoryRef>
+      
+        <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+            <ComponentRef Id="XOGARLIB.DLL" />
+            <ComponentRef Id="XOGARWINGUI.APPLICATION" />
+            <ComponentRef Id="XOGARWINGUI.EXE" />
+            <ComponentRef Id="XOGARWINGUI.EXE.CONFIG" />
+            <ComponentRef Id="XOGARWINGUI.EXE.MANIFEST" />
+            <ComponentRef Id="XogarShortcut"/>
+            <ComponentRef Id="Readme" />
+            <ComponentRef Id="License" />
+        </Feature>
+        <UI />
+    </Product>
+</Wix>

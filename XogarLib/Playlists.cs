@@ -12,6 +12,8 @@ namespace XogarLib
         [XmlElement("Playlists")]
         public List<Playlist> Lists { get; set; }
 
+        private static string envFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Xogar\\" + Settings.Default.PlaylistFile;
+
         public Playlists()
         {
             Lists = new List<Playlist>();
@@ -20,7 +22,7 @@ namespace XogarLib
         public void Save()
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Playlists));
-            FileStream stream = new FileStream(Settings.Default.PlaylistFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            FileStream stream = new FileStream(envFolderPath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             serializer.Serialize(stream, this);
         }
 
@@ -28,9 +30,9 @@ namespace XogarLib
         {
             XmlSerializer deserialize = new XmlSerializer(typeof(Playlists));
 
-            if (File.Exists(Settings.Default.PlaylistFile))
+            if (File.Exists(envFolderPath))
             {
-                FileStream stream = new FileStream(Settings.Default.PlaylistFile, FileMode.Open, FileAccess.Read);
+                FileStream stream = new FileStream(envFolderPath, FileMode.Open, FileAccess.Read);
                 Playlists gameSelectLists = (Playlists)deserialize.Deserialize(stream);
                 stream.Close();
 
