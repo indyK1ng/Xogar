@@ -35,8 +35,9 @@ namespace XogarLib
             return FindAllSteamGames();
         }
 
-        private void FindAllGameInstallDirs(string configContents)
+        private void FindAllGameInstallDirs()
         {
+            string configContents = ReadConfigFile();
             gameInstallDirs.Add(installDir);
 
             string gamesInstallLocations = @"\u0022BaseInstallFolder_\d+\u0022\s*\u0022.*\u0022";
@@ -57,11 +58,50 @@ namespace XogarLib
 
         private IDictionary<String, Game> FindAllSteamGames()
         {
-            StreamReader configReader = new StreamReader(configLocation);
-            string configContents = configReader.ReadToEnd();
-            configReader.Close();
+            FindAllGameInstallDirs();
+            var configFileDict = FindAllSteamGamesFromConfigFile();
+            var manifestFileDict = FindAllSteamGamesFromManifestFiles();
 
-            FindAllGameInstallDirs(configContents);
+            var mergedDict = configFileDict.Concat(manifestFileDict)
+                .GroupBy(d => d.Key)
+                .ToDictionary(d => d.Key, d => d.First().Value);
+            return mergedDict;
+        }
+
+        private IDictionary<string, Game> FindAllSteamGamesFromManifestFiles()
+        {
+            var manifestGames = new Dictionary<string, Game>();
+
+            foreach (string dir in gameInstallDirs)
+            {
+                string steamAppsDir = ManifestPathStringBuilder(dir).ToString();
+
+                if (Directory.Exists(steamAppsDir))
+                {
+                    List<string> manifestFiles = new List<string>(Directory.EnumerateFiles(steamAppsDir));
+
+                    foreach (var manifestFile in manifestFiles)
+                    {
+                        if (manifestFile.Contains("appmanifest_"))
+                        {
+                            string[] splitManifest = manifestFile.Split(new string[] {"appmanifest_"},
+                                StringSplitOptions.None);
+                            Int64 gameId = Int64.Parse(splitManifest[1].Replace(".acf", ""));
+                            String gameName = GetGameName(gameId);
+                            Game manifestGame = new SteamGame(gameId);
+                            manifestGame.Name = gameName;
+                            manifestGames.Add(manifestGame.Hash(), manifestGame);
+                        }
+                    }
+                }
+            }
+
+            return manifestGames;
+        }
+
+        private IDictionary<string, Game> FindAllSteamGamesFromConfigFile()
+        {
+            var configContents = ReadConfigFile();
 
             Dictionary<String, Game> steamGames = new Dictionary<String, Game>();
             MatchCollection gameListing = GetAllAppListingsFromConfig(configContents);
@@ -76,6 +116,14 @@ namespace XogarLib
                 }
             }
             return steamGames;
+        }
+
+        private string ReadConfigFile()
+        {
+            StreamReader configReader = new StreamReader(configLocation);
+            string configContents = configReader.ReadToEnd();
+            configReader.Close();
+            return configContents;
         }
 
         private MatchCollection GetAllAppListingsFromConfig(string configContents)
@@ -114,9 +162,7 @@ namespace XogarLib
         {
             foreach (string gamesInstallDir in gameInstallDirs)
             {
-                StringBuilder gameFileStringBuilder = new StringBuilder();
-                gameFileStringBuilder.Append(gamesInstallDir);
-                gameFileStringBuilder.Append("\\SteamApps\\");
+                var gameFileStringBuilder = ManifestPathStringBuilder(gamesInstallDir);
                 gameFileStringBuilder.AppendFormat(APP_FILENAME_TEMPLATE, gameId);
 
                 if (File.Exists(gameFileStringBuilder.ToString()))
@@ -126,6 +172,14 @@ namespace XogarLib
             }
 
             return "DNE";
+        }
+
+        private static StringBuilder ManifestPathStringBuilder(string gamesInstallDir)
+        {
+            StringBuilder gameFileStringBuilder = new StringBuilder();
+            gameFileStringBuilder.Append(gamesInstallDir);
+            gameFileStringBuilder.Append("\\SteamApps\\");
+            return gameFileStringBuilder;
         }
 
         private static string ParseOutGameName(StreamReader manifestReader)

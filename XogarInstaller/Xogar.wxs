@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>  
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="5D6D0EBE-9A40-4D78-B5AB-BF1C5A5F06CB" Name="Xogar" Language="1033" Version="1.3.1" Manufacturer="Xogar Open Source Devs" UpgradeCode="5EAB86C3-D79A-493B-BC7D-534E40F91E70">
+    <Product Id="5D6D0EBE-9A40-4D78-B5AB-BF1C5A5F06CB" Name="Xogar" Language="1033" Version="1.3.2" Manufacturer="Xogar Open Source Devs" UpgradeCode="5EAB86C3-D79A-493B-BC7D-534E40F91E70">
         <Package Description="The Xogar Windows GUI." Comments="Xogar starts a random game in your collection" InstallerVersion="200" Compressed="yes" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
       <MajorUpgrade 
