@@ -16,6 +16,10 @@ namespace XogarWinGui
         private Games picker;
         private Playlists gamesLists;
 
+        private static string steamInstallDirStoragePath =
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Xogar\\" +
+            Properties.Settings.Default.SteamInstallDirStorage;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -25,7 +29,7 @@ namespace XogarWinGui
             }
             catch (Exception)
             {
-                if (File.Exists(Properties.Settings.Default.SteamInstallDirStorage))
+                if (File.Exists(steamInstallDirStoragePath))
                 {
                     ReadInstallLocationAndLoadGames();
                 }
@@ -43,7 +47,7 @@ namespace XogarWinGui
 
         private void ReadInstallLocationAndLoadGames()
         {
-            FileStream reader = new FileStream(Properties.Settings.Default.SteamInstallDirStorage, FileMode.Open);
+            FileStream reader = new FileStream(steamInstallDirStoragePath, FileMode.Open);
             StreamReader locationReader = new StreamReader(reader);
 
             String actualInstallDir = locationReader.ReadToEnd();
@@ -61,7 +65,8 @@ namespace XogarWinGui
 
         private static void SaveSteamInstallDir(string actualInstallDir)
         {
-            FileStream saveLocation = new FileStream(Properties.Settings.Default.SteamInstallDirStorage, FileMode.Create);
+            CreateAppDataFolder();
+            FileStream saveLocation = new FileStream(steamInstallDirStoragePath, FileMode.Create);
             StreamWriter locationWriter = new StreamWriter(saveLocation);
             locationWriter.AutoFlush = true;
             locationWriter.Write(actualInstallDir.ToString());
@@ -103,14 +108,19 @@ namespace XogarWinGui
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
+            CreateAppDataFolder();
+
+            picker.ThirdParty.Save();
+            gamesLists.Save();
+        }
+
+        private static void CreateAppDataFolder()
+        {
             string envFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Xogar\\";
             if (!Directory.Exists(envFolder))
             {
                 Directory.CreateDirectory(envFolder);
             }
-
-            picker.ThirdParty.Save();
-            gamesLists.Save();
         }
 
         private void Create_PlaylistClick(object sender, RoutedEventArgs e)
