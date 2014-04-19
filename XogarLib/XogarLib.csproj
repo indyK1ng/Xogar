@@ -64,6 +64,7 @@
     <Compile Include="ThirdPartyGame.cs" />
     <Compile Include="ThirdPartyGameParser.cs" />
     <Compile Include="ThirdPartyGames.cs" />
+    <Compile Include="XmlDataInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
