@@ -15,6 +15,7 @@ namespace XogarLib
         private string configLocation;
         private readonly string APP_FILENAME_TEMPLATE = "appmanifest_{0}.acf";
         private List<String> gameInstallDirs;
+        private IDictionary<String, Game> _gamesListing;
 
         public SimpleValveGameParser(string steamInstallDir)
         {
@@ -27,12 +28,19 @@ namespace XogarLib
             
             gameInstallDirs = new List<String>();
 
+            _gamesListing = new Dictionary<string, Game>();
+
             configLocation = steamInstallDir + "\\config\\config.vdf";
         }
 
         public IDictionary<String, Game> GetGameListing()
         {
-            return FindAllSteamGames();
+            if (_gamesListing.Count == 0)
+            {
+                _gamesListing = FindAllSteamGames();
+            }
+
+            return _gamesListing;
         }
 
         private void FindAllGameInstallDirs()
