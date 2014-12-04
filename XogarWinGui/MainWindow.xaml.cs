@@ -161,7 +161,10 @@ namespace XogarWinGui
 
                 foreach (String gameHash in picker.SelectedPlaylist.GameHashes)
                 {
-                    playlistGames.Add(picker.GamesToPick[gameHash]);
+                    if (picker.GamesToPick.ContainsKey(gameHash))
+                    {
+                        playlistGames.Add(picker.GamesToPick[gameHash]);
+                    }
                 }
 
                 PlaylistItems.ItemsSource = playlistGames;
