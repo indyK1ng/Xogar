@@ -97,6 +97,12 @@ namespace XogarLib
                             Int64 gameId = Int64.Parse(splitManifest[1].Replace(".acf", ""));
                             String gameName = GetGameName(gameId);
                             Game manifestGame = new SteamGame(gameId);
+
+                            if (manifestGames.ContainsKey(manifestGame.Hash()))
+                            {
+                                continue;
+                            }
+
                             manifestGame.Name = gameName;
                             manifestGames.Add(manifestGame.Hash(), manifestGame);
                         }
