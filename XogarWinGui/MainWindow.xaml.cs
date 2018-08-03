@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using XogarLib;
@@ -14,7 +15,10 @@ namespace XogarWinGui
     public partial class MainWindow : Window
     {
         private Games picker;
-        private Playlists gamesLists;
+        private readonly Playlists gamesLists;
+        private IEnumerable<Playlist> AllPlaylists => new List<Playlist> { picker.AllGamesPlaylist }.Union(gamesLists.CustomPlaylists);
+        public Dictionary<String, Playlist> PlaylistDictionary => AllPlaylists.ToDictionary(l => l.Name, l => l);
+
 
         private static string steamInstallDirStoragePath =
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Xogar\\" +
@@ -42,7 +46,8 @@ namespace XogarWinGui
             gamesLists = Playlists.Load();
             DataContext = this;
 
-            playlistBox.ItemsSource = playlistDictionary;
+            playlistBox.ItemsSource = PlaylistDictionary;
+            playlistBox.SelectedIndex = 0;
         }
 
         private void ReadInstallLocationAndLoadGames()
@@ -73,31 +78,6 @@ namespace XogarWinGui
             saveLocation.Close();
         }
 
-        public Dictionary<String, Playlist> playlistDictionary
-        {
-            get
-            {
-                Dictionary<String, Playlist> tempDict = new Dictionary<string, Playlist>();
-
-                foreach (Playlist tempList in gamesLists.Lists)
-                {
-                    tempDict.Add(tempList.Name, tempList);
-                }
-
-                return tempDict;
-            }
-        }
-
-        // Electing not to use a command pattern right now because
-        //  there is only one way to access this.  If/when the UI gets
-        //  more complicated where there are multiple ways to do things,
-        //  this will be refactored.
-        private void LaunchRandom(object sender, RoutedEventArgs e)
-        {
-            Game launcher = picker.PickRandomGame();
-            launcher.Launch();
-        }
-
         private void NewThirdParty_OnClick(object sender, RoutedEventArgs e)
         {
             var window = new AddThirdParty();
@@ -125,19 +105,18 @@ namespace XogarWinGui
 
         private void Create_PlaylistClick(object sender, RoutedEventArgs e)
         {
-            var window = new CreatePlaylist();
-            window.GameContainer = picker;
+            var window = new CreatePlaylist { GameContainer = picker };
             window.ShowDialog();
 
             if (window.newList != null)
             {
-                gamesLists.Lists.Add(window.newList);
+                gamesLists.CustomPlaylists.Add(window.newList);
             }
 
-            playlistBox.ItemsSource = playlistDictionary;
+            playlistBox.ItemsSource = PlaylistDictionary;
         }
 
-        private void PlaylistRandom_Click(object sender, RoutedEventArgs e)
+        private void PlayRandom_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -153,28 +132,19 @@ namespace XogarWinGui
 
         private void playlistBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            if (playlistBox.SelectedIndex > -1)
+            picker.SelectedPlaylist = ((KeyValuePair<String, Playlist>) playlistBox.SelectedValue).Value;
+
+            List<Game> playlistGames = new List<Game>();
+
+            foreach (String gameHash in picker.SelectedPlaylist.GameHashes)
             {
-                picker.SelectedPlaylist = ((KeyValuePair<String, Playlist>) playlistBox.SelectedValue).Value;
-
-                List<Game> playlistGames = new List<Game>();
-
-                foreach (String gameHash in picker.SelectedPlaylist.GameHashes)
+                if (picker.GamesToPick.ContainsKey(gameHash))
                 {
-                    if (picker.GamesToPick.ContainsKey(gameHash))
-                    {
-                        playlistGames.Add(picker.GamesToPick[gameHash]);
-                    }
+                    playlistGames.Add(picker.GamesToPick[gameHash]);
                 }
-
-                PlaylistItems.ItemsSource = playlistGames;
             }
-            else
-            {
-                picker.SelectedPlaylist = null;
 
-                PlaylistItems.ItemsSource = new List<Game>();
-            }
+            PlaylistItems.ItemsSource = playlistGames;
         }
 
         private SteamInstallSelectorWindow ChangeSteamInstallDir()

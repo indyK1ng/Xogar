@@ -8,8 +8,11 @@ namespace XogarLib
     public class Games
     {
         private IDictionary<String, Game> games;
-        private readonly ThirdPartyGames thirdParty;
-        private IList<IGameListingParser> gameListingParsers;
+        private readonly IList<IGameListingParser> gameListingParsers;
+        private readonly Random random = new Random();
+
+        public ThirdPartyGames ThirdParty { get; }
+        public IDictionary<String, Game> GamesToPick => games;
 
         public Games()
         {
@@ -20,7 +23,7 @@ namespace XogarLib
             gameListingParsers.Add(parser);
 
             var thirdPartyParser = new ThirdPartyGameParser();
-            thirdParty = thirdPartyParser.thirdPartyGames;
+            ThirdParty = thirdPartyParser.thirdPartyGames;
 
             gameListingParsers.Add(thirdPartyParser);
 
@@ -36,7 +39,7 @@ namespace XogarLib
             gameListingParsers.Add(parser);
 
             var thirdPartyParser = new ThirdPartyGameParser();
-            thirdParty = thirdPartyParser.thirdPartyGames;
+            ThirdParty = thirdPartyParser.thirdPartyGames;
 
             gameListingParsers.Add(thirdPartyParser);
 
@@ -57,32 +60,26 @@ namespace XogarLib
 
         public Playlist SelectedPlaylist { get; set; }
 
-        public ThirdPartyGames ThirdParty
+        public Playlist AllGamesPlaylist
         {
-            get { return thirdParty; }
-        }
-
-        public IDictionary<String, Game> GamesToPick
-        {
-            get { return games; }
-        }
-
-        public Game PickRandomGame()
-        {
-            return GamesToPick.ElementAt((new Random()).Next(GamesToPick.Count())).Value;
+            get
+            {
+                var playlist = new Playlist("All Steam Games");
+                foreach (var game in GamesToPick.Keys)
+                {
+                    playlist.AddGame(game);
+                }
+                return playlist;
+            }
         }
 
         public Game PickRandomGameFromPlaylist(int tries)
         {
-            if (SelectedPlaylist == null)
-            {
-                return PickRandomGame();
-            }
             List<string> hashes = SelectedPlaylist.GameHashes;
 
             try
             {
-                return GamesToPick[hashes.ElementAt((new Random()).Next(hashes.Count))];
+                return GamesToPick[hashes.ElementAt(random.Next(hashes.Count))];
             }
             catch (KeyNotFoundException)
             {

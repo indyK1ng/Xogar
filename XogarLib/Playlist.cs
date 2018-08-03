@@ -14,6 +14,8 @@ namespace XogarLib
         [XmlElement("Games")]
         public List<String> GameHashes { get; set; }
 
+        private readonly Random random = new Random();
+
         public Playlist()
         {
             GameHashes = new List<string>();
@@ -22,7 +24,6 @@ namespace XogarLib
         public Playlist(string name):this()
         {
             Name = name;
-
         }
 
         public void AddGame(string hash)
@@ -32,8 +33,7 @@ namespace XogarLib
 
         public void Random()
         {
-
-            GameHashes.ElementAt((new Random()).Next(GameHashes.Count()));
+            GameHashes.ElementAt(random.Next(GameHashes.Count()));
         }
 
         public override string ToString()

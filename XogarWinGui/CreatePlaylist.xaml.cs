@@ -19,20 +19,9 @@ namespace XogarWinGui
     /// </summary>
     public partial class CreatePlaylist : Window
     {
-        private Games container;
-
         public Playlist newList;
 
-        public Games GameContainer
-        {
-            get { return container; }
-
-            set
-            {
-                container = value;
-                
-            } 
-        }
+        public Games GameContainer { get; set; }
 
         public CreatePlaylist()
         {
