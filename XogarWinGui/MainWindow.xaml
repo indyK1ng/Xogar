@@ -7,6 +7,7 @@
         <Menu Margin="0,0,0,290" Height="25" VerticalAlignment="Top">
             <MenuItem Header="File">
                 <MenuItem Header="_Add Third Party Game" Click="NewThirdParty_OnClick"></MenuItem>
+                <MenuItem Header="_Exit" Click="Exit_OnClick"></MenuItem>
             </MenuItem>
         </Menu>
        <Button Content="Create Playlist" HorizontalAlignment="Left" Height="50" Margin="255,251,0,0" VerticalAlignment="Top" Width="111" Click="Create_PlaylistClick"/>

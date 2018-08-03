@@ -183,5 +183,10 @@ namespace XogarWinGui
             window.ShowDialog();
             return window;
         }
+
+        private void Exit_OnClick(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 }
