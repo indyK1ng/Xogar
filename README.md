@@ -24,3 +24,5 @@ How to Run
 Run the MSI file.  The application will be installed to C:\Program Files (x86)\Xogar and will have a Start Menu shortcut.  Just run XogarWinGui.exe.
 
 If you installed version 1.2.0 and want to keep your list of third party games and playlists, copy the ThirdPartyGames.xml and Playlists.xml files from the directory you were running Xogar from into C:\Users\[username]\AppData\Roaming\Xogar where [username] is your username.  Be aware that the AppData folder is hidden so you may have to manually enter it into the address box in the explorer window.
+
+_Icon courtesy of [Dave Gandy](https://www.flaticon.com/authors/dave-gandy)_

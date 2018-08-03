@@ -1,7 +1,7 @@
 ﻿<Window x:Class="XogarWinGui.CreatePlaylist"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Create Playlist" Height="354" Width="510" ResizeMode="CanResizeWithGrip" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow">
+        Title="Create Playlist" Height="354" Width="510" ResizeMode="CanResizeWithGrip" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" Icon="Resources/Icon.ico">
     <Grid>
         <ListBox Margin="10,42,202,9" ItemsSource="{Binding GameContainer.GamesToPick}" SelectionMode="Multiple" Name="SelectedGames">
             <ListBox.ItemTemplate>
