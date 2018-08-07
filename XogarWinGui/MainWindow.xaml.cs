@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Threading;
 using XogarLib;
 
 namespace XogarWinGui
@@ -14,6 +15,8 @@ namespace XogarWinGui
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const string PLAY_RANDOM_TEXT = "Start random game!";
+        private DispatcherTimer playRandomTimer;
         private Games picker;
         private readonly Playlists gamesLists;
         private IEnumerable<Playlist> AllPlaylists => new List<Playlist> { picker.AllGamesPlaylist }.Union(gamesLists.CustomPlaylists);
@@ -42,6 +45,8 @@ namespace XogarWinGui
                     PromptForSteamInstallDir();
                 }
             }
+
+            btnPlayRandom.Content = PLAY_RANDOM_TEXT;
 
             gamesLists = Playlists.Load();
             DataContext = this;
@@ -118,15 +123,52 @@ namespace XogarWinGui
 
         private void PlayRandom_Click(object sender, RoutedEventArgs e)
         {
-            try
+            if (playRandomTimer != null)
             {
-                Game launcher = picker.PickRandomGameFromPlaylist(0);
-                launcher.Launch();
+                StopTimer();
+                btnPlayRandom.Content = PLAY_RANDOM_TEXT;
             }
-            catch
+            else
             {
-                MessageBox.Show(
-                    "There appears to have been an issue finding a game to launch from that playlist.\nIt's possible no games from that list are installed.");
+                Game game = picker.PickRandomGameFromPlaylist(0);
+                LaunchGameAfterTimeout(game);
+            }
+        }
+
+        private void LaunchGameAfterTimeout(Game game, int timeoutSecs = 3)
+        {
+            StopTimer();
+            if (timeoutSecs <= 0)
+            {
+                try
+                {
+                    playRandomTimer = null;
+                    game.Launch();
+                    btnPlayRandom.Content = PLAY_RANDOM_TEXT;
+                }
+                catch
+                {
+                    MessageBox.Show(
+                        "There appears to have been an issue finding a game to launch from that playlist.\nIt's possible no games from that list are installed.");
+                }
+            }
+            else
+            {
+                string gameName = String.IsNullOrWhiteSpace(game.Name) ? "(unknown)" : game.Name;
+                playRandomTimer = new DispatcherTimer();
+                playRandomTimer.Interval = TimeSpan.FromSeconds(1);
+                playRandomTimer.Tick += (sender, args) => LaunchGameAfterTimeout(game, timeoutSecs - 1);
+                btnPlayRandom.Content = $"Launching '{gameName}' (Click to cancel)\n{timeoutSecs}...";
+                playRandomTimer.Start();
+            }
+        }
+
+        private void StopTimer()
+        {
+            if (playRandomTimer != null)
+            {
+                playRandomTimer.Stop();
+                playRandomTimer = null;
             }
         }
 

@@ -11,7 +11,7 @@
             </MenuItem>
         </Menu>
 
-        <Button Content="Start random game!" Margin="10,0,10,10" Click="PlayRandom_Click" FontWeight="Bold" Height="50" VerticalAlignment="Bottom"/>
+        <Button Margin="10,0,10,10" Click="PlayRandom_Click" FontWeight="Bold" Height="50" VerticalAlignment="Bottom" Name="btnPlayRandom"/>
 
         <GroupBox Header="Playlists" Margin="10,30,5,65">
             <Grid>
