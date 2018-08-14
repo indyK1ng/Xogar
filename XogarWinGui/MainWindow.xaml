@@ -16,10 +16,10 @@
         <GroupBox Header="Playlists" Margin="10,30,5,65">
             <Grid>
                 <Label Content="Current playlist:" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top"/>
-                <ComboBox Height="24" Margin="97,12,33,0" VerticalAlignment="Top" ItemsSource="{Binding playlistDictionary}" Name="playlistBox" SelectionChanged="playlistBox_SelectionChanged">
+                <ComboBox Height="24" Margin="97,12,33,0" VerticalAlignment="Top" Name="playlistBox" SelectionChanged="playlistBox_SelectionChanged">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Key}"/>
+                            <TextBlock Text="{Binding Name}"/>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>

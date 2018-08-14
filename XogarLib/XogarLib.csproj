@@ -60,6 +60,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="SimpleValveGameParser.cs" />
+    <Compile Include="SteamCategoryParser.cs" />
     <Compile Include="SteamGame.cs" />
     <Compile Include="ThirdPartyGame.cs" />
     <Compile Include="ThirdPartyGameParser.cs" />

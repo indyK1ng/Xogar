@@ -18,9 +18,11 @@ namespace XogarWinGui
         private const string PLAY_RANDOM_TEXT = "Start random game!";
         private DispatcherTimer playRandomTimer;
         private Games picker;
+        private SteamCategoryParser steamCategoryParser;
         private readonly Playlists gamesLists;
-        private IEnumerable<Playlist> AllPlaylists => new List<Playlist> { picker.AllGamesPlaylist }.Union(gamesLists.CustomPlaylists);
-        public Dictionary<String, Playlist> PlaylistDictionary => AllPlaylists.ToDictionary(l => l.Name, l => l);
+        private IEnumerable<Playlist> AllPlaylists => new List<Playlist> { picker.AllInstalledGamesPlaylist }
+            .Union(steamCategoryParser.Categories.OrderBy(c => c.Name))
+            .Union(gamesLists.CustomPlaylists.OrderBy(c => c.Name));
 
 
         private static string steamInstallDirStoragePath =
@@ -33,6 +35,7 @@ namespace XogarWinGui
             try
             {
                 picker = new Games();
+                steamCategoryParser = new SteamCategoryParser(picker);
             }
             catch (Exception)
             {
@@ -51,18 +54,19 @@ namespace XogarWinGui
             gamesLists = Playlists.Load();
             DataContext = this;
 
-            playlistBox.ItemsSource = PlaylistDictionary;
+            playlistBox.ItemsSource = AllPlaylists;
             playlistBox.SelectedIndex = 0;
         }
 
         private void ReadInstallLocationAndLoadGames()
         {
-            FileStream reader = new FileStream(steamInstallDirStoragePath, FileMode.Open);
-            StreamReader locationReader = new StreamReader(reader);
-
-            String actualInstallDir = locationReader.ReadToEnd();
-            picker = new Games(actualInstallDir);
-            locationReader.Close();
+            using (FileStream reader = new FileStream(steamInstallDirStoragePath, FileMode.Open))
+            using (StreamReader locationReader = new StreamReader(reader))
+            {
+                String actualInstallDir = locationReader.ReadToEnd();
+                picker = new Games(actualInstallDir);
+                steamCategoryParser = new SteamCategoryParser(picker, actualInstallDir);
+            }
         }
 
         private void PromptForSteamInstallDir()
@@ -76,11 +80,12 @@ namespace XogarWinGui
         private static void SaveSteamInstallDir(string actualInstallDir)
         {
             CreateAppDataFolder();
-            FileStream saveLocation = new FileStream(steamInstallDirStoragePath, FileMode.Create);
-            StreamWriter locationWriter = new StreamWriter(saveLocation);
-            locationWriter.AutoFlush = true;
-            locationWriter.Write(actualInstallDir.ToString());
-            saveLocation.Close();
+            using (FileStream saveLocation = new FileStream(steamInstallDirStoragePath, FileMode.Create))
+            using (StreamWriter locationWriter = new StreamWriter(saveLocation))
+            {
+                locationWriter.AutoFlush = true;
+                locationWriter.Write(actualInstallDir.ToString());
+            }
         }
 
         private void NewThirdParty_OnClick(object sender, RoutedEventArgs e)
@@ -118,7 +123,7 @@ namespace XogarWinGui
                 gamesLists.CustomPlaylists.Add(window.newList);
             }
 
-            playlistBox.ItemsSource = PlaylistDictionary;
+            playlistBox.ItemsSource = AllPlaylists;
         }
 
         private void PlayRandom_Click(object sender, RoutedEventArgs e)
@@ -174,7 +179,7 @@ namespace XogarWinGui
 
         private void playlistBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            picker.SelectedPlaylist = ((KeyValuePair<String, Playlist>) playlistBox.SelectedValue).Value;
+            picker.SelectedPlaylist = (Playlist)playlistBox.SelectedValue;
 
             List<Game> playlistGames = new List<Game>();
 
@@ -186,7 +191,7 @@ namespace XogarWinGui
                 }
             }
 
-            PlaylistItems.ItemsSource = playlistGames;
+            PlaylistItems.ItemsSource = playlistGames.OrderBy(o => o.Name);
         }
 
         private SteamInstallSelectorWindow ChangeSteamInstallDir()
