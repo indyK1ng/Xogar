@@ -7,17 +7,16 @@ namespace XogarLib
 {
     public class Games
     {
-        private IDictionary<String, Game> games;
         private readonly IList<IGameListingParser> gameListingParsers;
         private readonly Random random = new Random();
 
         public ThirdPartyGames ThirdParty { get; }
-        public IDictionary<String, Game> GamesToPick => games;
+        public IDictionary<String, Game> GamesToPick { get; private set; }
 
         public Games()
         {
             gameListingParsers = new List<IGameListingParser>();
-            games = new Dictionary<String, Game>();
+            GamesToPick = new Dictionary<String, Game>();
 
             IGameListingParser parser = new SimpleValveGameParser(Properties.Settings.Default.SteamInstallDirectory);
             gameListingParsers.Add(parser);
@@ -33,7 +32,7 @@ namespace XogarLib
         public Games(String steamInstallDir)
         {
             gameListingParsers = new List<IGameListingParser>();
-            games = new Dictionary<String, Game>();
+            GamesToPick = new Dictionary<String, Game>();
 
             IGameListingParser parser = new SimpleValveGameParser(steamInstallDir);
             gameListingParsers.Add(parser);
@@ -48,19 +47,19 @@ namespace XogarLib
 
         private void MergeGamesLists()
         {
-            games = new Dictionary<string, Game>();
+            GamesToPick = new Dictionary<string, Game>();
 
             foreach (IGameListingParser parse in gameListingParsers)
             {
-                games = GamesToPick.Union(parse.GetGameListing()).ToDictionary(k => k.Key, v => v.Value);
+                GamesToPick = GamesToPick.Union(parse.GetGameListing()).ToDictionary(k => k.Key, v => v.Value);
             }
 
-            games = games.OrderBy(k => k.Value.Name).ToDictionary(k => k.Key, v => v.Value);
+            GamesToPick = GamesToPick.OrderBy(k => k.Value.Name).ToDictionary(k => k.Key, v => v.Value);
         }
 
         public Playlist SelectedPlaylist { get; set; }
 
-        public Playlist AllGamesPlaylist
+        public Playlist AllInstalledGamesPlaylist
         {
             get
             {
@@ -107,6 +106,8 @@ namespace XogarLib
 
             return gameList.ToString();
         }
+
+        public bool IsInstalled(string gameHash) => GamesToPick.ContainsKey(gameHash);
 
         public void UpdateGameList()
         {
