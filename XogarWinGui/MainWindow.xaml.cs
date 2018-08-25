@@ -61,11 +61,13 @@ namespace XogarWinGui
         private void ReadInstallLocationAndLoadGames()
         {
             using (FileStream reader = new FileStream(steamInstallDirStoragePath, FileMode.Open))
-            using (StreamReader locationReader = new StreamReader(reader))
             {
-                String actualInstallDir = locationReader.ReadToEnd();
-                picker = new Games(actualInstallDir);
-                steamCategoryParser = new SteamCategoryParser(picker, actualInstallDir);
+                using (StreamReader locationReader = new StreamReader(reader))
+                {
+                    String actualInstallDir = locationReader.ReadToEnd();
+                    picker = new Games(actualInstallDir);
+                    steamCategoryParser = new SteamCategoryParser(picker, actualInstallDir);
+                }
             }
         }
 
@@ -81,10 +83,12 @@ namespace XogarWinGui
         {
             CreateAppDataFolder();
             using (FileStream saveLocation = new FileStream(steamInstallDirStoragePath, FileMode.Create))
-            using (StreamWriter locationWriter = new StreamWriter(saveLocation))
             {
-                locationWriter.AutoFlush = true;
-                locationWriter.Write(actualInstallDir.ToString());
+                using (StreamWriter locationWriter = new StreamWriter(saveLocation))
+                {
+                    locationWriter.AutoFlush = true;
+                    locationWriter.Write(actualInstallDir.ToString());
+                }
             }
         }
 
