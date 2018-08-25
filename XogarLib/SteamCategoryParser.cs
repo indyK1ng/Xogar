@@ -64,8 +64,7 @@ namespace XogarLib
                         .Where(games.IsInstalled)
                         .ToList()
                 })
-                .Where(c => c.GameHashes.Any())
-                .ToList();
+                .Where(c => c.GameHashes.Any());
         }
 
         private IEnumerable<string> GetCategoriesFromTagsString(string tagsString)
