@@ -207,7 +207,7 @@ namespace XogarWinGui
 
         private void Exit_OnClick(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown();
+            this.Close();
         }
     }
 }
