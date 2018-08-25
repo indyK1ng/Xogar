@@ -94,7 +94,6 @@ namespace XogarLib
                             string[] splitManifest = manifestFile.Split(new string[] {"appmanifest_"},
                                 StringSplitOptions.None);
                             Int64 gameId = Int64.Parse(splitManifest[1].Replace(".acf", ""));
-                            String gameName = GetGameName(gameId);
                             Game manifestGame = new SteamGame(gameId);
 
                             if (manifestGames.ContainsKey(manifestGame.Hash()))
@@ -102,7 +101,7 @@ namespace XogarLib
                                 continue;
                             }
 
-                            manifestGame.Name = gameName;
+                            manifestGame.Name = GetGameName(gameId);
                             manifestGames.Add(manifestGame.Hash(), manifestGame);
                         }
                     }
