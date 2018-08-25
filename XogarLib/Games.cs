@@ -12,22 +12,10 @@ namespace XogarLib
 
         public ThirdPartyGames ThirdParty { get; }
         public IDictionary<String, Game> GamesToPick { get; private set; }
+        public Playlist SelectedPlaylist { get; set; }
+        public Playlist AllInstalledGamesPlaylist { get; private set; }
 
-        public Games()
-        {
-            gameListingParsers = new List<IGameListingParser>();
-            GamesToPick = new Dictionary<String, Game>();
-
-            IGameListingParser parser = new SimpleValveGameParser(Properties.Settings.Default.SteamInstallDirectory);
-            gameListingParsers.Add(parser);
-
-            var thirdPartyParser = new ThirdPartyGameParser();
-            ThirdParty = thirdPartyParser.thirdPartyGames;
-
-            gameListingParsers.Add(thirdPartyParser);
-
-            MergeGamesLists();
-        }
+        public Games() : this(Properties.Settings.Default.SteamInstallDirectory) {}
 
         public Games(String steamInstallDir)
         {
@@ -42,7 +30,7 @@ namespace XogarLib
 
             gameListingParsers.Add(thirdPartyParser);
 
-            MergeGamesLists();
+            UpdateGameList();
         }
 
         private void MergeGamesLists()
@@ -57,18 +45,12 @@ namespace XogarLib
             GamesToPick = GamesToPick.OrderBy(k => k.Value.Name).ToDictionary(k => k.Key, v => v.Value);
         }
 
-        public Playlist SelectedPlaylist { get; set; }
-
-        public Playlist AllInstalledGamesPlaylist
+        private void UpdateAllInstalledGamesPlaylist()
         {
-            get
+            AllInstalledGamesPlaylist = new Playlist("All Steam Games");
+            foreach (var game in GamesToPick.Keys)
             {
-                var playlist = new Playlist("All Steam Games");
-                foreach (var game in GamesToPick.Keys)
-                {
-                    playlist.AddGame(game);
-                }
-                return playlist;
+                AllInstalledGamesPlaylist.AddGame(game);
             }
         }
 
@@ -112,6 +94,7 @@ namespace XogarLib
         public void UpdateGameList()
         {
             MergeGamesLists();
+            UpdateAllInstalledGamesPlaylist();
         }
     }
 }
