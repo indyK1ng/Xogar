@@ -48,10 +48,7 @@ namespace XogarLib
         private void UpdateAllInstalledGamesPlaylist()
         {
             AllInstalledGamesPlaylist = new Playlist("All Steam Games");
-            foreach (var game in GamesToPick.Keys)
-            {
-                AllInstalledGamesPlaylist.AddGame(game);
-            }
+            AllInstalledGamesPlaylist.GameHashes = GamesToPick.Keys.ToList();
         }
 
         public Game PickRandomGameFromPlaylist(int tries)
