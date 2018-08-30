@@ -48,7 +48,7 @@ namespace XogarLib
             string configContents = ReadConfigFile();
             gameInstallDirs.Add(installDir);
 
-            string gamesInstallLocations = @"\u0022BaseInstallFolder_\d+\u0022\s*\u0022.*\u0022";
+            string gamesInstallLocations = @"""BaseInstallFolder_\d+""\s*"".*""";
             Regex installDirsRegex = new Regex(gamesInstallLocations);
             MatchCollection installListing = installDirsRegex.Matches(configContents);
 
@@ -70,10 +70,9 @@ namespace XogarLib
             var configFileDict = FindAllSteamGamesFromConfigFile();
             var manifestFileDict = FindAllSteamGamesFromManifestFiles();
 
-            var mergedDict = configFileDict.Concat(manifestFileDict)
+            return configFileDict.Concat(manifestFileDict)
                 .GroupBy(d => d.Key)
                 .ToDictionary(d => d.Key, d => d.First().Value);
-            return mergedDict;
         }
 
         private IDictionary<string, Game> FindAllSteamGamesFromManifestFiles()
@@ -95,7 +94,6 @@ namespace XogarLib
                             string[] splitManifest = manifestFile.Split(new string[] {"appmanifest_"},
                                 StringSplitOptions.None);
                             Int64 gameId = Int64.Parse(splitManifest[1].Replace(".acf", ""));
-                            String gameName = GetGameName(gameId);
                             Game manifestGame = new SteamGame(gameId);
 
                             if (manifestGames.ContainsKey(manifestGame.Hash()))
@@ -103,7 +101,7 @@ namespace XogarLib
                                 continue;
                             }
 
-                            manifestGame.Name = gameName;
+                            manifestGame.Name = GetGameName(gameId);
                             manifestGames.Add(manifestGame.Hash(), manifestGame);
                         }
                     }
@@ -142,8 +140,7 @@ namespace XogarLib
 
         private MatchCollection GetAllAppListingsFromConfig(string configContents)
         {
-            string appRegexString = @"\u0022(\d)+\u0022\s*{\s*([^}])*}";
-            Regex gamesRegex = new Regex(appRegexString);
+            Regex gamesRegex = new Regex(@"""(\d)+""\s*{\s*([^}])*}");
             MatchCollection gamesListing = gamesRegex.Matches(configContents);
 
             return gamesListing;
@@ -199,7 +196,7 @@ namespace XogarLib
         private static string ParseOutGameName(StreamReader manifestReader)
         {
             string manifestFile = manifestReader.ReadToEnd();
-            string appRegexString = @"\u0022(name)\u0022\s*\u0022.*";
+            string appRegexString = @"""(name)""\s*"".*";
 
             string name = Regex.Match(manifestFile, appRegexString).ToString();
 
@@ -220,11 +217,11 @@ namespace XogarLib
             }
 
             // Gets the game ID
-            string gameIdRegex = @"\u0022(\d)+\u0022";
+            string gameIdRegex = @"""(\d)+""";
             Int64 gameId = Int64.Parse(Regex.Match(matchContent, gameIdRegex).ToString().Replace("\"", ""));
 
             // Makes sure the game is installed
-            string installedAndUpToDate = @"\u0022HasAllLocalContent\u0022\s*\u0022\d\u0022";
+            string installedAndUpToDate = @"""HasAllLocalContent""\s*""\d""";
             string hasLocalContentLine = Regex.Match(matchContent, installedAndUpToDate).ToString();
             
             // After retargeting to .NET 4.0, experienced a weird issue here where no line was being returned.

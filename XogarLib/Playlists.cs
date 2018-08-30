@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Documents;
 using System.Xml.Serialization;
 using XogarLib.Properties;
@@ -10,13 +11,13 @@ namespace XogarLib
     public class Playlists
     {
         [XmlElement("Playlists")]
-        public List<Playlist> Lists { get; set; }
+        public List<Playlist> CustomPlaylists { get; set; }
 
-        private static string envFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Xogar\\" + Settings.Default.PlaylistFile;
+        private static readonly string envFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Xogar\\" + Settings.Default.PlaylistFile;
 
         public Playlists()
         {
-            Lists = new List<Playlist>();
+            CustomPlaylists = new List<Playlist>();
         }
 
         public void Save()

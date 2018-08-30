@@ -7,82 +7,57 @@ namespace XogarLib
 {
     public class Games
     {
-        private IDictionary<String, Game> games;
-        private readonly ThirdPartyGames thirdParty;
-        private IList<IGameListingParser> gameListingParsers;
+        private readonly IList<IGameListingParser> gameListingParsers;
+        private readonly Random random = new Random();
 
-        public Games()
-        {
-            gameListingParsers = new List<IGameListingParser>();
-            games = new Dictionary<String, Game>();
+        public ThirdPartyGames ThirdParty { get; }
+        public IDictionary<String, Game> GamesToPick { get; private set; }
+        public Playlist SelectedPlaylist { get; set; }
+        public Playlist AllInstalledGamesPlaylist { get; private set; }
 
-            IGameListingParser parser = new SimpleValveGameParser(Properties.Settings.Default.SteamInstallDirectory);
-            gameListingParsers.Add(parser);
-
-            var thirdPartyParser = new ThirdPartyGameParser();
-            thirdParty = thirdPartyParser.thirdPartyGames;
-
-            gameListingParsers.Add(thirdPartyParser);
-
-            MergeGamesLists();
-        }
+        public Games() : this(Properties.Settings.Default.SteamInstallDirectory) {}
 
         public Games(String steamInstallDir)
         {
             gameListingParsers = new List<IGameListingParser>();
-            games = new Dictionary<String, Game>();
+            GamesToPick = new Dictionary<String, Game>();
 
             IGameListingParser parser = new SimpleValveGameParser(steamInstallDir);
             gameListingParsers.Add(parser);
 
             var thirdPartyParser = new ThirdPartyGameParser();
-            thirdParty = thirdPartyParser.thirdPartyGames;
+            ThirdParty = thirdPartyParser.thirdPartyGames;
 
             gameListingParsers.Add(thirdPartyParser);
 
-            MergeGamesLists();
+            UpdateGameList();
         }
 
         private void MergeGamesLists()
         {
-            games = new Dictionary<string, Game>();
+            GamesToPick = new Dictionary<string, Game>();
 
             foreach (IGameListingParser parse in gameListingParsers)
             {
-                games = GamesToPick.Union(parse.GetGameListing()).ToDictionary(k => k.Key, v => v.Value);
+                GamesToPick = GamesToPick.Union(parse.GetGameListing()).ToDictionary(k => k.Key, v => v.Value);
             }
 
-            games = games.OrderBy(k => k.Value.Name).ToDictionary(k => k.Key, v => v.Value);
+            GamesToPick = GamesToPick.OrderBy(k => k.Value.Name).ToDictionary(k => k.Key, v => v.Value);
         }
 
-        public Playlist SelectedPlaylist { get; set; }
-
-        public ThirdPartyGames ThirdParty
+        private void UpdateAllInstalledGamesPlaylist()
         {
-            get { return thirdParty; }
-        }
-
-        public IDictionary<String, Game> GamesToPick
-        {
-            get { return games; }
-        }
-
-        public Game PickRandomGame()
-        {
-            return GamesToPick.ElementAt((new Random()).Next(GamesToPick.Count())).Value;
+            AllInstalledGamesPlaylist = new Playlist("All Steam Games");
+            AllInstalledGamesPlaylist.GameHashes = GamesToPick.Keys.ToList();
         }
 
         public Game PickRandomGameFromPlaylist(int tries)
         {
-            if (SelectedPlaylist == null)
-            {
-                return PickRandomGame();
-            }
             List<string> hashes = SelectedPlaylist.GameHashes;
 
             try
             {
-                return GamesToPick[hashes.ElementAt((new Random()).Next(hashes.Count))];
+                return GamesToPick[hashes.ElementAt(random.Next(hashes.Count))];
             }
             catch (KeyNotFoundException)
             {
@@ -111,9 +86,12 @@ namespace XogarLib
             return gameList.ToString();
         }
 
+        public bool IsInstalled(string gameHash) => GamesToPick.ContainsKey(gameHash);
+
         public void UpdateGameList()
         {
             MergeGamesLists();
+            UpdateAllInstalledGamesPlaylist();
         }
     }
 }

@@ -22,18 +22,11 @@ namespace XogarLib
         public Playlist(string name):this()
         {
             Name = name;
-
         }
 
         public void AddGame(string hash)
         {
             GameHashes.Add(hash);
-        }
-
-        public void Random()
-        {
-
-            GameHashes.ElementAt((new Random()).Next(GameHashes.Count()));
         }
 
         public override string ToString()
