@@ -16,6 +16,10 @@ namespace XogarLib
         private readonly string APP_FILENAME_TEMPLATE = "appmanifest_{0}.acf";
         private List<String> gameInstallDirs;
         private IDictionary<String, Game> _gamesListing;
+        private readonly string appRegexString = @"""(name)""\s*"".*";
+        private readonly string installDirRegexString = @"""(installdir)""\s*"".*";
+        private readonly Regex _nameMatchingRegex;
+        private readonly Regex _installDirMatchingRegex;
 
         public SimpleValveGameParser(string steamInstallDir)
         {
@@ -31,6 +35,9 @@ namespace XogarLib
             _gamesListing = new Dictionary<string, Game>();
 
             configLocation = steamInstallDir + "\\config\\config.vdf";
+
+            _nameMatchingRegex = new Regex(appRegexString);
+            _installDirMatchingRegex = new Regex(installDirRegexString);
         }
 
         public IDictionary<String, Game> GetGameListing()
@@ -102,7 +109,11 @@ namespace XogarLib
                             }
 
                             manifestGame.Name = GetGameName(gameId);
-                            manifestGames.Add(manifestGame.Hash(), manifestGame);
+
+                            if (manifestGame.Name != String.Empty)
+                            {
+                                manifestGames.Add(manifestGame.Hash(), manifestGame);
+                            }
                         }
                     }
                 }
@@ -185,7 +196,7 @@ namespace XogarLib
             return "DNE";
         }
 
-        private static StringBuilder ManifestPathStringBuilder(string gamesInstallDir)
+        private StringBuilder ManifestPathStringBuilder(string gamesInstallDir)
         {
             StringBuilder gameFileStringBuilder = new StringBuilder();
             gameFileStringBuilder.Append(gamesInstallDir);
@@ -193,18 +204,58 @@ namespace XogarLib
             return gameFileStringBuilder;
         }
 
-        private static string ParseOutGameName(StreamReader manifestReader)
+        private string ParseOutGameName(StreamReader manifestReader)
         {
             string manifestFile = manifestReader.ReadToEnd();
-            string appRegexString = @"""(name)""\s*"".*";
 
-            string name = Regex.Match(manifestFile, appRegexString).ToString();
+            var appName = String.Empty;
 
-            name = name.Replace("\"name\"", "");
-            name = name.Replace("\"", "");
-            name = name.Trim();
+            // Try to get the best name for displaying from different possible listings in the manifest file.
+            appName = GetGameNameFromRegex(_nameMatchingRegex, manifestFile, appName, "name");
 
-            return name;
+            // If we don't have an app name yet, get the name of the install dir.
+            if (appName == String.Empty)
+            {
+                appName = GetGameNameFromRegex(_installDirMatchingRegex, manifestFile, appName, "installdir");
+            }
+
+            return appName;
+        }
+
+        private string GetGameNameFromRegex(Regex matchingRegex, string manifestFile, string appName, string keyName)
+        {
+            foreach (Match nameMatch in matchingRegex.Matches(manifestFile))
+            {
+                var nameString = nameMatch.Value;
+
+                nameString = nameString.Replace($"\"{keyName}\"", "");
+                nameString = nameString.Replace("\"", "");
+                nameString = nameString.Trim();
+
+                if (nameString.StartsWith("appid_"))
+                {
+                    continue;
+                }
+
+                if (appName == String.Empty)
+                {
+                    appName = nameString;
+                }
+                else
+                {
+                    // If we have multiple names, take the shorter of the two that doesn't omit spaces.
+                    bool currentNameContainsSpace = appName.Contains(" ");
+                    bool otherNameContainsSpace = nameString.Contains(" ");
+
+                    if (currentNameContainsSpace == otherNameContainsSpace
+                        && nameString.Length < appName.Length)
+                    {
+                        appName = nameString;
+                    }
+                }
+            }
+
+            return appName;
         }
 
         private Game GetGameInformation(Match gameMatch)
@@ -266,7 +317,7 @@ namespace XogarLib
             return makeshiftName;
         }
 
-        private static short IsInstalled(string hasLocalContentLine)
+        private short IsInstalled(string hasLocalContentLine)
         {
             string textRemoved = hasLocalContentLine.Replace("HasAllLocalContent", "");
             string quotesRemoved = textRemoved.Replace("\"", "");
