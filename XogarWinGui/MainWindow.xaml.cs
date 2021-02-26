@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Threading;
@@ -28,6 +29,8 @@ namespace XogarWinGui
         private static string steamInstallDirStoragePath =
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Xogar\\" +
             Properties.Settings.Default.SteamInstallDirStorage;
+
+        public string WindowTitle => $"Xogar: Game Launcher v{Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
 
         public MainWindow()
         {
