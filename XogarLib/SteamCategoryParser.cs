@@ -32,6 +32,7 @@ namespace XogarLib
             return Directory.EnumerateDirectories(Path.Combine(steamInstallDir, "userdata"))
                 .AsParallel()
                 .Select(userdir => Path.Combine(userdir, @"7\remote\sharedconfig.vdf"))
+                .Where(File.Exists)
                 .Select(File.ReadAllText);
         }
 
