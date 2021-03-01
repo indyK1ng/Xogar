@@ -96,7 +96,7 @@ namespace XogarLib
 
                     foreach (var manifestFile in manifestFiles)
                     {
-                        if (manifestFile.Contains("appmanifest_"))
+                        if (manifestFile.Contains("appmanifest_") && manifestFile.EndsWith(".acf"))
                         {
                             string[] splitManifest = manifestFile.Split(new string[] {"appmanifest_"},
                                 StringSplitOptions.None);
